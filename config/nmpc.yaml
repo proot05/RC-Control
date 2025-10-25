@@ -1,0 +1,16 @@
+N: 30
+T: 1.5
+weights:
+  wd: 8.0
+  wth: 6.0
+  wv: 0.5
+  Ru: 0.2
+  Rd: 0.5
+  Su: 0.05
+  Sd: 0.2
+constraints:
+  delta_max: 0.6
+  delta_rate: 3.0
+  ax_min: -3.0
+  ax_max: 3.0
+  d_min: 0.5

@@ -1,0 +1,12 @@
+threads:
+  estimator_hz: 200
+  controller_hz: 50
+  vision_hz: 30
+timeouts_ms:
+  imu: 100
+  vision: 300
+  solver: 100
+queues:
+  imu: 2048
+  vision: 256
+  state: 512
