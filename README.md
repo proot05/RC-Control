@@ -12,6 +12,7 @@ Architecture:
 - `scripts/`, `docs/`, `tests/`, `data/`
 
 ## Quick start
+- assumes depthai already installed
 ```
 source .venv/bin/activate
 pip install -e .
