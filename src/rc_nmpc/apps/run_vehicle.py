@@ -114,14 +114,17 @@ def main():
 
                 if st.connected:
                     if st.a_pressed:
-                        mode = "track" if mode == "manual" else "manual"
+                        mode = "manual" if mode != "manual" else mode
                         print(f"[main] A -> {mode}")
                     elif st.b_pressed:
-                        mode = "simple"
-                        print("[main] B -> simple tracker")
+                        mode = "simple" if mode != "simple" else mode
+                        print(f"[main] B -> {mode}")
                     elif st.x_pressed:
-                        mode = "idle"
-                        print("[main] X -> idle")
+                        mode = "idle" if mode != "idle" else mode
+                        print(f"[main] X -> {mode}")
+                    elif st.y_pressed:
+                        mode = "track" if mode != "track" else mode
+                        print(f"[main] Y -> {mode}")
 
                 # If in MANUAL but no controller, force neutral continuously
                 if (not st.connected) and (mode == "manual"):
@@ -171,6 +174,7 @@ def main():
                         steer_cmd, ax_cmd = 0.0, 0.0
 
             # ---- Actuate & pace
+            # print("steer_cmd: ", steer_cmd, " drive: ", ax_cmd)
             act.send(steer_cmd, ax_cmd)
             rate.sleep()
 

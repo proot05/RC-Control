@@ -165,8 +165,8 @@ class OakdTracker:
 
         # Start device
         self._device = dai.Device(p)
-        self._q_tracklets = self._device.getOutputQueue("tracklets", maxSize=4, blocking=False)
-        self._q_preview   = self._device.getOutputQueue("preview",   maxSize=4, blocking=False)
+        self._q_tracklets = self._device.getOutputQueue("tracklets", maxSize=8, blocking=True)
+        self._q_preview   = self._device.getOutputQueue("preview",   maxSize=8, blocking=True)
 
     # ---- Background reader thread (VisionObject)
     def start_background(self, rate_hz: float = 60.0):
@@ -208,7 +208,7 @@ class OakdTracker:
         if self._q_tracklets is None:
             return None
 
-        track = self._q_tracklets.tryGet()
+        track = self._q_tracklets.Get()
         if track is None or not track.tracklets:
             return None
 

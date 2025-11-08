@@ -19,6 +19,7 @@ class GamepadState:
     a_pressed: bool = False      # A button (momentary)
     x_pressed: bool = False      # X button (momentary)
     b_pressed: bool = False      # B button (momentary)
+    y_pressed: bool = False      # Y button (momentary)
     connected: bool = False
 
 
@@ -71,7 +72,7 @@ class XboxController:
 
         try:
             for e in self.dev.read():
-                #print(e)
+                #rint(e)
                 if e.type == ecodes.EV_ABS:
                     ai = self.dev.absinfo(e.code)
                     lo, hi, flat = ai.min, ai.max, ai.flat
@@ -95,6 +96,8 @@ class XboxController:
                         self.state.b_pressed = (e.value == 1)
                     elif e.code == ecodes.BTN_C: # X button
                         self.state.x_pressed = (e.value == 1)
+                    elif e.code == ecodes.BTN_NORTH: # Y Button
+                        self.state.y_pressed = (e.value == 1)
 
             self.state.connected = True
         except BlockingIOError:
@@ -126,6 +129,7 @@ class XboxController:
                         a_pressed=st.a_pressed,
                         x_pressed=st.x_pressed,
                         b_pressed=st.b_pressed,
+                        y_pressed=st.y_pressed,
                         connected=st.connected,
                     )
                 time.sleep(period)
@@ -145,6 +149,7 @@ class XboxController:
                 a_pressed=st.a_pressed,
                 x_pressed=st.x_pressed,
                 b_pressed=st.b_pressed,
+                y_pressed=st.y_pressed,
                 connected=st.connected,
             )
 

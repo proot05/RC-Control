@@ -46,10 +46,10 @@ class SteeringMapper:
 @dataclass
 class EscConfig:
     # Base PWM calibration
-    min_us: int = 1000
-    max_us: int = 2000
+    min_us: int = 500
+    max_us: int = 2500
     zero_us: int = 1500
-    deadband_us: int = 15
+    deadband_us: int = 20
 
     # Legacy single-direction mapping (kept for compatibility)
     # Used if bidirectional == False
@@ -62,7 +62,7 @@ class EscConfig:
 
     # Common RC ESC policy: must apply brake before reverse engages
     require_brake_before_reverse: bool = True
-    brake_pulse_us: int = 1300     # µs to send during brake phase (below neutral)
+    brake_pulse_us: int = 500     # µs to send during brake phase (below neutral)
     brake_time_ms: int = 250       # how long to hold brake pulse before reverse
 
 

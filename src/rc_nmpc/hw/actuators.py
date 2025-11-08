@@ -83,7 +83,7 @@ class Actuators:
         # Map to pulse widths
         servo_us = self.servo_map.delta_to_us(delta_rad)
         esc_us = self.esc_map.ax_to_us(ax_cmd)
-        #print(servo_us, esc_us)
+        #print("Servo: ", servo_us, " ESC: ", esc_us)
 
         # Write (only if changed is fine; underlying backend can handle duplicates)
         if servo_us != self._last_servo_us:
