@@ -1,0 +1,15 @@
+# OAK-D spatial detection (MobileNetSSD) settings
+nnPath: "/home/paulstoller/Documents/Project_ROAR/RC-Control-main/src/rc_nmpc/models/mobilenet-ssd_openvino_2021.4_5shave.blob"
+full_frame: false     # set true to track on full RGB video stream
+confidence: 0.5
+
+# Depth range (millimeters)
+depth_lower_mm: 100
+depth_upper_mm: 5000
+
+# RGB preview for detector
+preview_w: 300
+preview_h: 300
+
+# Track labels (VOC 'person' = 15)
+track_labels: [15]

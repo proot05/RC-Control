@@ -1,0 +1,13 @@
+numpy
+scipy
+pyyaml
+filterpy
+casadi
+matplotlib
+pandas
+tqdm
+depthai
+pigpio
+evdev
+pytest
+rich

@@ -1,0 +1,10 @@
+m: 2.0
+Lf: 0.13
+Lr: 0.13
+Iz: 0.04
+steering:
+  delta_max: 0.6
+  rate_max: 3.0
+velocity:
+  vx_min: 0.0
+  vx_max: 5.0

@@ -1,0 +1,12 @@
+q_proc:
+  vx: 0.5
+  vy: 0.5
+  r:  0.5
+  bg: 1e-4
+  bax: 1e-3
+  bay: 1e-3
+r_meas:
+  bearing: 0.05
+  range:   0.05
+use_mag: false
+oos_history_ms: 300

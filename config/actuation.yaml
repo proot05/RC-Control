@@ -1,0 +1,24 @@
+# config/actuation.yaml
+servo_gpio: 18
+esc_gpio: 19
+
+servo:
+  min_us: 1000
+  max_us: 2000
+  zero_us: 1500
+  delta_max_rad: 0.6
+  rate_max_rad_s: 3.0
+
+esc:
+  min_us: 500
+  max_us: 2500
+  zero_us: 1500
+  deadband_us: 20
+
+  bidirectional: true
+  require_brake_before_reverse: true
+  brake_pulse_us: 500     # adjust per ESC
+  brake_time_ms: 250
+
+  forward_scale: 1.0
+  reverse_scale: 1.0
