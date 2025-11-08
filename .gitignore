@@ -4,3 +4,10 @@ id_*
 *.ppk
 *.key
 .ssh/
+.ssh/
+*.key
+id_*
+*.pem
+*.ppk
+git key
+git key.pub
