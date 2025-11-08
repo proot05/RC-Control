@@ -1,6 +1,8 @@
 # OAK-D spatial detection (MobileNetSSD) settings
-nnPath: "/home/paulstoller/Documents/Project_ROAR/RC-Control-main/src/rc_nmpc/models/mobilenet-ssd_openvino_2021.4_5shave.blob"
-full_frame: false     # set true to track on full RGB video stream
+nnModel: "Yolo"
+MBN_nnPath: "./rc_nmpc/models/ObjectDetection/mobilenet-ssd_openvino_2021.4_5shave.blob"
+Yolo_nnPath: "./rc_nmpc/models/ObjectDetection/yolo-v4-tiny-tf_openvino_2021.4_6shave.blob"
+full_frame: true     # set true to track on full RGB video stream
 confidence: 0.5
 
 # Depth range (millimeters)

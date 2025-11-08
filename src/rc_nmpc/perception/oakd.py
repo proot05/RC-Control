@@ -35,6 +35,7 @@ PERSON_LABEL = 15
 
 @dataclass
 class OakdParams:
+    nn_model: str
     nn_path: str
     full_frame: bool = False        # Track on full RGB frame if True
     conf_thresh: float = 0.5
@@ -59,11 +60,16 @@ class OakdTracker:
     """
     def __init__(self, config_path: str):
         cfg = load_yaml(config_path)
-        nn_path = cfg.get("nnPath")
+        nn_model = cfg.get("nnModel")
+        if nn_model == "Yolo":
+            nn_path = cfg.get("Yolo_nnPath")
+        elif nn_model == "MBN":
+            nn_path = cfg.get("MBN_nnPath")
         if not nn_path:
             raise ValueError("perception.yaml must define nnPath pointing to mobilenet-ssd blob")
 
         self.params = OakdParams(
+            nn_model=nn_model,
             nn_path=nn_path,
             full_frame=bool(cfg.get("full_frame", False)),
             conf_thresh=float(cfg.get("confidence", 0.5)),
@@ -100,7 +106,10 @@ class OakdTracker:
         monoLeft = p.create(dai.node.MonoCamera)
         monoRight = p.create(dai.node.MonoCamera)
         stereo = p.create(dai.node.StereoDepth)
-        ssd = p.create(dai.node.MobileNetSpatialDetectionNetwork)
+        if self.params.nn_model == "Yolo":
+            ssd = p.create(dai.node.YoloSpatialDetectionNetwork)
+        elif self.params.nn_model == "MBN":
+            ssd = p.create(dai.node.MobileNetSpatialDetectionNetwork)
         tracker = p.create(dai.node.ObjectTracker)
 
         # Outputs
@@ -134,6 +143,14 @@ class OakdTracker:
         ssd.setBoundingBoxScaleFactor(0.5)
         ssd.setDepthLowerThreshold(self.params.depth_lower_mm)
         ssd.setDepthUpperThreshold(self.params.depth_upper_mm)
+        
+        if self.params.nn_model == "Yolo":
+            # Yolo specific parameters
+            ssd.setNumClasses(80)
+            ssd.setCoordinateSize(4)
+            ssd.setAnchors([10,14, 23,27, 37,58, 81,82, 135,169, 344,319])
+            ssd.setAnchorMasks({ "side26": [1,2,3], "side13": [3,4,5] })
+            ssd.setIouThreshold(0.5)
 
         # Tracker props
         tracker.setDetectionLabelsToTrack(self.params.track_labels)  # e.g., [15] for person
@@ -165,8 +182,8 @@ class OakdTracker:
 
         # Start device
         self._device = dai.Device(p)
-        self._q_tracklets = self._device.getOutputQueue("tracklets", maxSize=8, blocking=True)
-        self._q_preview   = self._device.getOutputQueue("preview",   maxSize=8, blocking=True)
+        self._q_tracklets = self._device.getOutputQueue("tracklets", maxSize=8, blocking=False)
+        self._q_preview   = self._device.getOutputQueue("preview",   maxSize=8, blocking=False)
 
     # ---- Background reader thread (VisionObject)
     def start_background(self, rate_hz: float = 60.0):
@@ -208,7 +225,7 @@ class OakdTracker:
         if self._q_tracklets is None:
             return None
 
-        track = self._q_tracklets.Get()
+        track = self._q_tracklets.tryGet()
         if track is None or not track.tracklets:
             return None
 

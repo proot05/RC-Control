@@ -1,7 +1,7 @@
 # === Simple Tracker Control Parameters ===
-kp_steer: 1.2            # proportional gain on bearing (rad/rad)
+kp_steer: 1.5            # proportional gain on bearing (rad/rad)
 bearing_limit_rad: 0.6   # steering clamp [rad]
-constant_accel: 0.1      # constant forward accel command (unitless 0–1 range)
+constant_accel: 0      # constant forward accel command (unitless 0–1 range)
 min_range_m: 0.3         # ignore targets closer than this (m)
 stop_range_m: 0.6        # stop accelerating when closer than this (m)
 lost_timeout_ms: 300     # neutral if target unseen for this long (ms)

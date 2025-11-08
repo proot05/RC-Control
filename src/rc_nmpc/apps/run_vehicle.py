@@ -174,7 +174,7 @@ def main():
                         steer_cmd, ax_cmd = 0.0, 0.0
 
             # ---- Actuate & pace
-            # print("steer_cmd: ", steer_cmd, " drive: ", ax_cmd)
+            #print("steer_cmd: ", steer_cmd, " drive: ", ax_cmd)
             act.send(steer_cmd, ax_cmd)
             rate.sleep()
 
