@@ -96,6 +96,10 @@ class OakdTracker:
         # Generic stop for bg vision thread
         self._stop_evt = threading.Event()
         self._bg_thread: Optional[threading.Thread] = None
+        
+        self.fps: float = 0
+        self.counter: int = 0
+        self.startTime: float = 0
 
     # ---- Device / pipeline bring-up
     def start(self):
@@ -154,7 +158,7 @@ class OakdTracker:
 
         # Tracker props
         tracker.setDetectionLabelsToTrack(self.params.track_labels)  # e.g., [15] for person
-        tracker.setTrackerType(dai.TrackerType.ZERO_TERM_COLOR_HISTOGRAM)
+        tracker.setTrackerType(dai.TrackerType.SHORT_TERM_IMAGELESS)
         tracker.setTrackerIdAssignmentPolicy(dai.TrackerIdAssignmentPolicy.SMALLEST_ID)
 
         # Links
@@ -192,6 +196,8 @@ class OakdTracker:
             return
         self._stop_evt.clear()
         period = 1.0 / max(1.0, rate_hz)
+        
+        self.startTime = time.monotonic()
 
         def _loop():
             while not self._stop_evt.is_set():
@@ -228,6 +234,13 @@ class OakdTracker:
         track = self._q_tracklets.tryGet()
         if track is None or not track.tracklets:
             return None
+            
+        self.counter+=1
+        current_time = time.monotonic()
+        if (current_time - self.startTime) > 1 :
+            self.fps = self.counter / (current_time - self.startTime)
+            self.counter = 0
+            self.startTime = current_time
 
         # Choose first/primary tracklet (policy: SMALLEST_ID)
         t = track.tracklets[0]
@@ -333,12 +346,14 @@ class OakdTracker:
                         pass
 
                 try:
+                    cv.putText(frame, "NN fps: {:.2f}".format(self.fps), (2, frame.shape[0] - 4), cv.FONT_HERSHEY_TRIPLEX, 0.4, (255, 255, 255))
                     cv.imshow(self._window_name, frame)
                     # make window responsive, allow 'q' to close viewer only
                     if cv.waitKey(1) & 0xFF == ord('q'):
                         self._disp_stop_evt.set()
                         break
-                except Exception:
+                except Exception as e:
+                    print(e)
                     # if no display (e.g. headless), just stop
                     self._disp_stop_evt.set()
                     break

@@ -14,8 +14,8 @@ from rc_nmpc.utils.time_sync import Rate
 from rc_nmpc.hw.actuators import Actuators, PigpioBackend
 from rc_nmpc.hw.mapping import ServoConfig, EscConfig
 from rc_nmpc.hw.gamepad import XboxController
-from rc_nmpc.perception.oakd import OakdTracker
-
+#from rc_nmpc.perception.oakd import OakdTracker
+from rc_nmpc.perception.oakd_new import OakdTracker
 
 def build_actuators(cfg_path: str) -> Actuators:
     cfg = load_yaml(cfg_path)
@@ -38,7 +38,8 @@ def main():
     root = Path(__file__).resolve().parents[3]
     print(Path(__file__).resolve().parents[3])
     ap.add_argument("--actuation",  default=str(root / "config" / "actuation.yaml"))
-    ap.add_argument("--perception", default=str(root / "config" / "perception.yaml"))
+    #ap.add_argument("--perception", default=str(root / "config" / "perception.yaml"))
+    ap.add_argument("--perception", default=str(root / "config" / "perception_new.yaml"))
     ap.add_argument("--track_cfg",  default=str(root / "config" / "track_simple.yaml"))
     ap.add_argument("--mode", choices=["idle","bench","manual","track","simple"], default="manual")
     ap.add_argument("--arm", action="store_true")
@@ -68,7 +69,7 @@ def main():
     ts_cfg = load_yaml(args.track_cfg)
     kp = float(ts_cfg.get("kp_steer", 1.2))
     bearing_limit = float(ts_cfg.get("bearing_limit_rad", 0.6))
-    constant_ax = float(ts_cfg.get("constant_accel", 0.4))
+    constant_ax = float(ts_cfg.get("constant_accel", 0.8))
     min_range = float(ts_cfg.get("min_range_m", 0.3))
     stop_range = float(ts_cfg.get("stop_range_m", 0.6))
     lost_timeout_ms = int(ts_cfg.get("lost_timeout_ms", 300))
@@ -143,6 +144,7 @@ def main():
 
             elif mode == "manual":
                 if st and st.connected:
+                    #print("here", st)
                     steer_cmd = st.steer * 0.6
                     ax_cmd = st.accel - st.brake
 
@@ -151,14 +153,21 @@ def main():
                 steer_cmd, ax_cmd = 0.0, 0.0
 
             elif mode == "simple":
+                t0 = time.monotonic_ns()  #Redwan 120225
+                
                 # Non-blocking, stale-safe vision read
                 obj = tracker.get_latest(max_age_ms=200)
+                # 1- Vision read timing
+                t1 = time.monotonic_ns() #Redwan 120225
+                
+                # 2- Processing logic timing
                 t_now_ns = time.monotonic_ns()
                 if obj is not None and obj.conf > 0.0:
                     last_seen_ns = obj.t_cam
                     # Bearing in horizontal plane, camera/body frame
                     bearing = math.atan2(obj.x_b, obj.z_b if obj.z_b != 0.0 else 1e-6)
                     steer_cmd = clamp(kp * bearing, -bearing_limit, +bearing_limit)
+                    prev_cmd = steer_cmd
 
                     # Simple forward accel unless too close
                     dist = math.hypot(obj.x_b, obj.z_b)
@@ -166,17 +175,38 @@ def main():
                         ax_cmd = 0.0
                     else:
                         ax_cmd = constant_ax
+                    prev_ax = ax_cmd
                 else:
                     dt_ms = (t_now_ns - last_seen_ns) / 1e6 if last_seen_ns else 1e9
                     if dt_ms > lost_timeout_ms:
                         steer_cmd, ax_cmd = 0.0, 0.0
                     else:
-                        steer_cmd, ax_cmd = 0.0, 0.0
+                        steer_cmd, ax_cmd = prev_cmd, prev_ax
 
             # ---- Actuate & pace
             #print("steer_cmd: ", steer_cmd, " drive: ", ax_cmd)
+            #act.send(steer_cmd, ax_cmd)
+            #rate.sleep()
+            
+            ##Redwan 120225
+            t2 = time.monotonic_ns()
+
+            # 3- Actuation timing
             act.send(steer_cmd, ax_cmd)
+            t3 = time.monotonic_ns()
+
+            # 4- Rate control timing
             rate.sleep()
+            t4 = time.monotonic_ns()
+
+            # ---- Print timing breakdown ----
+            #print(
+             #   f"vision={(t1-t0)/1e6:.2f} ms, "
+             #   f"logic={(t2-t1)/1e6:.2f} ms, "
+              #  f"act={(t3-t2)/1e6:.2f} ms, "
+              #  f"sleep={(t4-t3)/1e6:.2f} ms, "
+              #  f"loop={(t4-t0)/1e6:.2f} ms"
+              #  ) #Redwan 120225
 
     except KeyboardInterrupt:
         print("n[main] Stopping.")
