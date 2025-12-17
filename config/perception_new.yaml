@@ -1,0 +1,12 @@
+# OAK-D spatial detection
+
+nn_name: "yolov6-nano"
+full_frame: false     # set true to track on full RGB video stream
+confidence: 0.5
+
+# Depth range (millimeters)
+depth_lower_mm: 100
+depth_upper_mm: 5000
+
+# Track labels 
+track_labels: [0]
