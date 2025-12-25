@@ -5,7 +5,7 @@ from .mapping import ServoConfig, EscConfig, SteeringMapper, EscMapper
 from .backends.pigpio_pwm import PigpioPwm, PigpioPins
 
 
-# -------------------- Backend wrapper (kept as you had it) --------------------
+# -------------------- Backend wrapper --------------------
 
 @dataclass
 class PigpioBackend:
@@ -48,7 +48,7 @@ class Actuators:
         self.servo_map = SteeringMapper(self.servo_cfg)
         self.esc_map = EscMapper(self.esc_cfg)
 
-        # cache last outputs (useful for diagnostics)
+        # cache last outputs
         self._last_servo_us: Optional[int] = None
         self._last_esc_us: Optional[int] = None
 
@@ -60,7 +60,6 @@ class Actuators:
     def arm_esc(self) -> None:
         """
         Run the ESC arming sequence defined by EscMapper.
-        If your ESC expects a different sequence, edit EscMapper.arm_sequence().
         """
         self.esc_map.arm_sequence(self.backend.write_esc)
 
@@ -85,7 +84,7 @@ class Actuators:
         esc_us = self.esc_map.ax_to_us(ax_cmd)
         #print("Servo: ", servo_us, " ESC: ", esc_us)
 
-        # Write (only if changed is fine; underlying backend can handle duplicates)
+        # Write
         if servo_us != self._last_servo_us:
             self.backend.write_servo(servo_us)
             self._last_servo_us = servo_us
