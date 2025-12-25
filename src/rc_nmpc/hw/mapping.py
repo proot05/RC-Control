@@ -14,7 +14,6 @@ class ServoConfig:
 class SteeringMapper:
     """
     Rate-limited steering: maps desired wheel angle (rad) to servo µs.
-    Preserves your original API & behavior.
     """
     def __init__(self, cfg: ServoConfig):
         self.cfg = cfg
@@ -60,7 +59,6 @@ class EscConfig:
     forward_scale: float = 1.0     # scale forward mapping (sensitivity)
     reverse_scale: float = 1.0     # scale reverse mapping (sensitivity)
 
-    # Common RC ESC policy: must apply brake before reverse engages
     require_brake_before_reverse: bool = True
     brake_pulse_us: int = 500     # µs to send during brake phase (below neutral)
     brake_time_ms: int = 250       # how long to hold brake pulse before reverse
@@ -87,7 +85,7 @@ class EscMapper:
         self._brake_until_ns = 0
 
     def _linear_one_direction(self, ax_cmd: float) -> int:
-        """Legacy single-direction mapping (your original behavior)."""
+        """Legacy single-direction mapping."""
         us = int(self.cfg.zero_us + float(ax_cmd) * self.cfg.accel_to_us_gain)
         if abs(us - self.cfg.zero_us) < self.cfg.deadband_us:
             us = self.cfg.zero_us
@@ -148,9 +146,7 @@ class EscMapper:
 
     def arm_sequence(self, writer_func):
         """
-        arming sequence: min -> max -> zero (each 1s).
-        Keep if  ESC expects this; otherwise replace with
-        a neutral-hold here.
+        arming sequence
         """
         print("If you don't have the ESC off start over...")
         writer_func(self.cfg.zero_us)
