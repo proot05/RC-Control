@@ -46,7 +46,6 @@ def main():
     ap.add_argument("--rate", type=float, default=50.0)
     ap.add_argument("--no-gamepad", action="store_true")
 
-    # NEW: optional OAK-D display (off by default)
     ap.add_argument("--display", action="store_true",
                     help="Show a live OAK-D window with detected bbox (runs in its own thread).")
     ap.add_argument("--display-rate", type=float, default=60.0,
@@ -149,7 +148,7 @@ def main():
                     ax_cmd = st.accel - st.brake
 
             elif mode == "track":
-                # NMPC placeholder '96 to be implemented
+                # NMPC placeholder
                 steer_cmd, ax_cmd = 0.0, 0.0
 
             elif mode == "simple":
