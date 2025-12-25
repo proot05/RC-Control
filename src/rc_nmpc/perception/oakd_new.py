@@ -153,8 +153,6 @@ class OakdTracker:
         # take the smallest ID when new object is tracked, possible options: SMALLEST_ID, UNIQUE_ID
         objectTracker.setTrackerIdAssignmentPolicy(dai.TrackerIdAssignmentPolicy.SMALLEST_ID)
         
-        # input arguments below may be incorrect, TESTTTTTT
-        
         self._q_preview = objectTracker.passthroughTrackerFrame.createOutputQueue(maxSize=8, blocking=False)
         self._q_tracklets = objectTracker.out.createOutputQueue(maxSize=8, blocking=False)
 
@@ -245,7 +243,7 @@ class OakdTracker:
         return VisionObject(
             t_cam=time.monotonic_ns(),
             x_b=x_m, y_b=y_m, z_b=z_m,
-            conf=1.0  # tracker doesn't expose class confidence; use 1.0
+            conf=1.0  
         )
 
     # ---- Display packet (frame + bbox) for external rendering
@@ -285,7 +283,7 @@ class OakdTracker:
                     y2 = max(0, min(int(br.y * H), H - 1))
                     if x2 > x1 and y2 > y1:
                         bbox_xyxy = (x1, y1, x2, y2)
-                        conf = 1.0  # tracker doesn't expose confidence
+                        conf = 1.0 
 
         return (frame, bbox_xyxy, conf)
 
