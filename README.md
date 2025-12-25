@@ -1,4 +1,4 @@
-# RC NMPC (Python-only, full architecture)
+# RC Control
 
 Architecture:
 - `perception/` (OAK-D Pro pipeline stubs)
