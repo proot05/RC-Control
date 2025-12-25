@@ -82,7 +82,7 @@ class OakdTracker:
 
         self._device: Optional[dai.Device] = None
         self._q_tracklets: Optional[dai.DataOutputQueue] = None
-        self._q_preview: Optional[dai.DataOutputQueue] = None  # NEW: frames for display
+        self._q_preview: Optional[dai.DataOutputQueue] = None
 
         # Background snapshot machinery (object)
         self._latest: Optional[VisionObject] = None
@@ -120,7 +120,7 @@ class OakdTracker:
         xoutTrack = p.create(dai.node.XLinkOut)
         xoutTrack.setStreamName("tracklets")
 
-        # NEW: preview frames for display (synced to SSD passthrough)
+        # preview frames for display (synced to SSD passthrough)
         xoutPrev = p.create(dai.node.XLinkOut)
         xoutPrev.setStreamName("preview")
 
@@ -181,7 +181,7 @@ class OakdTracker:
 
         tracker.out.link(xoutTrack.input)
 
-        # NEW: also send passthrough frames out for GUI
+        # send passthrough frames out for GUI
         ssd.passthrough.link(xoutPrev.input)
 
         # Start device
@@ -253,7 +253,7 @@ class OakdTracker:
         return VisionObject(
             t_cam=time.monotonic_ns(),
             x_b=x_m, y_b=y_m, z_b=z_m,
-            conf=1.0  # tracker doesn't expose class confidence; use 1.0
+            conf=1.0  
         )
 
     # ---- Display packet (frame + bbox) for external rendering
@@ -296,7 +296,7 @@ class OakdTracker:
                     # Ensure proper ordering
                     if x2 > x1 and y2 > y1:
                         bbox_xyxy = (x1, y1, x2, y2)
-                        conf = 1.0  # tracker doesn't expose confidence
+                        conf = 1.0  
 
         return (frame, bbox_xyxy, conf)
 
