@@ -12,7 +12,7 @@ Architecture:
 - `scripts/`, `docs/`, `tests/`, `data/`
 
 ## Quick start
-- assumes [depthai]([https://docs.luxonis.com/software-v3/depthai/]) already installed
+- assumes [depthai](https://docs.luxonis.com/software-v3/depthai/) already installed
 ```
 source .venv/bin/activate
 pip install -e .
